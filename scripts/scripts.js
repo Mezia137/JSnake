@@ -14,7 +14,6 @@ let snake = [
 	{x: 160, y: 200},
 ];
 
-let score = 0;
 
 let changing_direction = false;
 
@@ -24,8 +23,8 @@ let dx = 10;
 let dy = 0;
 
 let challenge = document.getElementById("challenge");
-// challenge.classList.add("show");
-challenge.onclick = function(){challenge.style.bottom = "-500px";};
+let challenge_completed = document.getElementById("challenge_completed");
+challenge_completed.onclick = function(){challenge.style.bottom = "-500px";};
 
 main();
 
@@ -55,7 +54,7 @@ window.onModulesLoaded = new Promise( function( resolve, reject ) {
 function main() {
 	
 	if (has_game_ended()) {
-		challenge.style.bottom = "50px";
+		//challenge.style.bottom = "50px";
 		return
 	};
 	changing_direction = false;
@@ -162,10 +161,6 @@ function move_snake()
   const has_eaten_food = snake[0].x === food_x && snake[0].y === food_y;
       if (has_eaten_food) {
 		challenge.style.bottom = "50px";
-        // Increase score
-        score += 10;
-        // Display score on screen
-        document.getElementById('score').innerHTML = score;
         // Generate new food location
         gen_food();
       } else {
