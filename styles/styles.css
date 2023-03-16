@@ -1,84 +1,41 @@
 body {
-border : 0;
 margin : 0;
-padding : 0;
-background-color : #000000;
+background-color : rgba(0,0,0,1);
 }
 
-#snakeboard	{
-/*
-width : 100%;
-height : 100%;
-*/
-
+#territory	{
 position : fixed;
 
-padding : 0;
-margin : 0;
-border : 0px;
-position: absolute;
 top: 50%;
 left: 50%;
 transform: translate(-50%, -50%);
-
-box-shadow: inset 0px 0px 20px 20px;
 }
 
-#menu {
-top : -150px;
-position : fixed;
-display : flex;
-margin : auto;
-/* From https://css.glass */
-background: rgba(34, 165, 155, 0.26);
-border-radius: 16px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(7.7px);
--webkit-backdrop-filter: blur(7.7px);
-border: 1px solid rgba(34, 165, 155, 0.19);
+#glass {
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
 }
 
-#menu div {
-height : 100px;
-width : 100px;
-font-family : ubuntu;
-margin : 20px;
-text-align : center;
-}
-
-#container {
-width : 100%;
-height : 100%;
+#challenge {
+width : 1000px;
+height : 300px;
 
 position: fixed;
-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,1);
+bottom: -500px;
+padding: 20px;
+left: 50%;
+transform: translateX(-50%);
 
-}
-#challenge {
-	width : 1000px;
-	height : 300px;
+transition : bottom 1s ease-out;
 
-	position: fixed;
-	bottom: -500px; /* La hauteur de l'élément */
-	left: 0;
-	right: 0;
-	padding: 20px;
-/*
-	border-top: 0px solid #cccccc;
-*/
-	transition : bottom 1s ease-out;
-	margin: 0 auto;
-
-	box-shadow : 0 0 20px 10px rgba(0,0,0,0.3);
-/*
-	background-color : #7B868C;
-	opacity: 0.4;
-*/
 /* From https://css.glass */
-	background: rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
-	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-	backdrop-filter: blur(6.6px);
-	-webkit-backdrop-filter: blur(6.6px);
-	border: 1px solid rgba(255, 255, 255, 0.32);
+background: rgba(255, 255, 255, 0.1);
+border-radius: 16px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(6.6px);
+-webkit-backdrop-filter: blur(6.6px);
+border: 1px solid rgba(255, 255, 255, 0.32);
 }
