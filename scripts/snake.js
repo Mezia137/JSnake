@@ -1,86 +1,94 @@
-
 // get territory
 const territory = document.getElementById("territory");
-// get context 
 const territory_ctx = territory.getContext("2d");
 
 // set game scale
-const scale = 20;
+const scale = 50;
 
 // set territory dimentions
 territory.height = Math.round(window.innerHeight / scale) * scale;
 territory.width = Math.round(window.innerWidth / scale) * scale;
 
-let glass = document.getElementById("glass");
+// set glass dimentions
+const glass = document.getElementById("glass");
 glass.style.height = territory.height+'px';
 glass.style.width = territory.width+'px';
 
+glass.style.backdropFilter = "blur(0px)";
+
+// play button
+const play_button = document.getElementById("play-tile");
+//~ play_button.onclick = main();
+
 // challenge
-const challenge_tile = document.getElementById("challenge");
-const challenge_completed_button = document.getElementById("challenge_completed");
-let challenge_completed = true;
-let challenge_finish = true;
-challenge_completed_button.onclick = function () {challenge_completed = true; challenge_tile.style.bottom = "-550px";};
-challenge_tile.addEventListener("transitionend", function () {if (challenge_completed === true) {challenge_finish = true}});
+//~ const challenge_mode = true;
+
+//~ const challenge_tile = document.getElementById("challenge");
+//~ const challenge_completed_button = document.getElementById("challenge_completed");
+//~ const challenge_rule = document.getElementById("rule");
+
+//~ let challenge_completed = true;
+//~ let challenge_in_progress;
+//~ let is_challenge_in_progress = false;
+
+//~ challenge_completed_button.onclick = function () {challenge_completed = true; glass.style.backdropFilter = "blur(0px)"; challenge_tile.style.bottom = "-550px"; console.log('ok')};
+//~ challenge_completed_button.onclick = function () {challenge_completed = true; disparition()};
+//~ challenge_completed_button.removeEventListener('onclick', te());
+//~ challenge_tile.addEventListener("transitionend", function () {if (challenge_completed === true) {is_challenge_in_progress = false}});
+
+//~ function te(){challenge_completed = true; glass.style.backdropFilter = "blur(0px)"; challenge_tile.style.bottom = "-550px"; console.log('ok')}
+//~ function te(){challenge_completed = true; disparition()}
+
+
 
 // colors
-const board_border = '#7B868C';
-const board_background = "#181926";
-const snake_color = "#D7D7D9";
-const snake_border_color = "#386273";
-const food_color = "#BF3939";
-const food_border_color = '#F27777';
+const board_background = "#262626";
+const snake_color = "#BFBFBF";
+const dead_snake_color = "#BF3939";
+const food_color = ["#D9141460", "#D91414A0", "#D91414FF"];
 
 // initial snake positions
 let initials_positions = [
-	{x: 200, y: 200},
-	{x: 180, y: 200},
-	{x: 160, y: 200},
-	{x: 140, y: 200},
-	{x: 120, y: 200},
+	{x: scale*10, y: scale*10},
+	{x: scale*9, y: scale*10},
+	{x: scale*8, y: scale*10},
+	{x: scale*7, y: scale*10},
+	{x: scale*6, y: scale*10},
 ];
 
-// initial food position
-let food_position = {x: 0, y:0}
-
-// snake class definition
+// snake class
 class Snake {
 	constructor (vertebrae, direction={x: scale, y: 0}) {
 		this.vertebrae = vertebrae;
 		this.direction = direction;
 		this.changing_direction = false;
-		this.head = vertebrae[0];	
+		this.head = vertebrae[0];
+		this.growing_up = 0;
 	}
 	
 	draw_vertebra (vertebra) {
 		territory_ctx.fillStyle = snake_color;
-		//~ territory_ctx.strokestyle = snake_border_color;
 		territory_ctx.fillRect(vertebra.x, vertebra.y, scale, scale);  
-		//~ territory_ctx.strokeRect(vertebra.x, vertebra.y, scale, scale);
 	}
 	
 	draw () {
 		this.vertebrae.forEach(this.draw_vertebra);
-		//~ if (this.ate_food()) {
-			//~ challenge()
-			//~ generate_food();
-		//~ }
 	}
 	
 	next_head () {
-		this.head = {x: (this.vertebrae[0].x + this.direction.x)%territory.width,
-					y: (this.vertebrae[0].y + this.direction.y)%territory.height};
+		this.head = {x: ((this.vertebrae[0].x + this.direction.x)%territory.width+territory.width)%territory.width,
+					y: ((this.vertebrae[0].y + this.direction.y)%territory.height+territory.height)%territory.height};
 	}
 	
-	ate_food () {
+	did_ate_food (food_position) {
 		return this.head.x === food_position.x && this.head.y === food_position.y;
 	}
 	
 	move () {
 		this.next_head();
-		if (this.ate_food()) {
-			challenge()
-			generate_food();
+		if (this.growing_up > 0) {
+			--this.growing_up;
+			
 		} else {
 			this.vertebrae.pop();
 		}
@@ -96,11 +104,10 @@ class Snake {
 	
 	dead () {
 		this.vertebrae.forEach(function(vertebra) {
-			territory_ctx.fillStyle = 'red';  
-			territory_ctx.strokestyle = 'darkblue';
+			territory_ctx.fillStyle = dead_snake_color;  
 			territory_ctx.fillRect(vertebra.x, vertebra.y, scale, scale);  
-			territory_ctx.strokeRect(vertebra.x, vertebra.y, scale, scale);
 			})
+		console.log(this.vertebrae.length-5);
 	}
 	
 	change_direction (event) {
@@ -132,17 +139,81 @@ class Snake {
 	}
 }
 
-main();
+// challenge class
+class Food {
+	constructor (type, position) {
+		this.position = position;
+		this.type = type;
+		this.grow_power = (this.type+1)*2;
 
+	}
+	
+	draw () {
+		territory_ctx.fillStyle = food_color[this.type];
+		territory_ctx.fillRect(this.position.x, this.position.y, scale, scale);
+	}
+	
+	generate_position (snake, foods) {
+		let occuped_positions = []
+		occuped_positions = occuped_positions.concat(snake.vertebrae)
+		foods.forEach(food => occuped_positions.push(food.position))
+		
+		this.position.x = random_number(0, territory.width-scale, scale);
+		this.position.y = random_number(0, territory.height-scale, scale);
+		
+		//~ for (const position of occuped_positions) {
+			//~ console.log(position)
+			//~ if (this.food_position.x == position.x && this.food_position.y == position.y) {
+				//~ this.food_position_generate(snake, challenges);
+			//~ }
+		//~ }
+		//~ console.log(occuped_positions)
+	}
+	
+	//~ challenger () {
+		//~ challenge_completed = false;
+		//~ is_challenge_in_progress = true;
+		//~ glass.style.animation = "flou-progressif 2s ease-out";
+		//~ challenge_tile.style.bottom = "50px";
+	//~ }
+	
+	//~ complete_challenge () {
+		
+	//~ }
+}
+
+init();
+
+// main game
 function main () {
-	generate_food()
+	while (true) {
+		[snake, foods] = init();
+		play_button.onclick = function () {main(game_loop (snake, foods))};
+	}
+}
+
+// initialisation
+function init () {
+	const foods = [new Food(0, {x: 100*scale, y: 50*scale}),
+			new Food(1, {x: 102*scale, y: 50*scale}),
+			new Food(2, {x: 104*scale, y: 50*scale}),];
+	
 	const snake = new Snake(initials_positions, direction={x: scale, y: 0});
+	
+	foods.forEach(food => food.generate_position(snake, foods));
 	document.addEventListener("keydown", function (event) {snake.change_direction(event)});
-	game(snake);
+	game_loop(snake, foods);
+	
+	clear_territory();
+	foods.forEach(food => food.draw());
+	snake.draw();
+	
+	game_loop(snake, foods)
+	//~ return [snake, foods];
 }
 
 // game loop
-function game (snake) {
+function game_loop (snake, foods) {
 	if (snake.is_dead()) {
 		snake.dead();
 		return
@@ -150,15 +221,27 @@ function game (snake) {
 	snake.changing_direction = false;
 	
 	setTimeout(function onTick() {
-		if (challenge_finish) {
+		if (1==1) {
 			snake.move();
-			
+			for (let food of foods) {
+				if (snake.did_ate_food(food.position)) {
+					snake.growing_up += food.grow_power;
+					//~ if (challenge_mode) {
+						//~ challenge_in_progress = challenge; 
+						//~ challenge_in_progress.challenger();
+					//~ }
+					food.generate_position(snake, foods);
+				}
+			}
+				
 			clear_territory();
-			draw_food();
+			foods.forEach(food => food.draw());
 			snake.draw();
+		} else {
+			//~ challenge_in_progress.complete_challenge();
 		}
 		
-		game(snake);
+		game_loop(snake, foods );
 	}, 100)
 }
 
@@ -167,33 +250,6 @@ function clear_territory() {
 	territory_ctx.fillRect(0, 0, territory.width, territory.height);
 }
 
-function draw_food() {
-	territory_ctx.fillStyle = food_color;
-	//~ territory_ctx.strokestyle = food_border_color;
-	territory_ctx.fillRect(food_position.x, food_position.y, scale, scale);
-	//~ territory_ctx.strokeRect(food_position.x, food_position.y, scale, scale);
-}
-
 function random_number(min, max, step) {
 	return Math.round((Math.random() * (max-min)) / step) * step + min;
-}
-    
-function generate_food() {
-	food_position.x = random_number(0, territory.width-scale, scale);
-	food_position.y = random_number(0, territory.height-scale, scale);
-      
-      //~ snake.forEach(function has_snake_eaten_food(part) {
-        //~ const has_eaten = part.x == food_x && part.y == food_y;
-        //~ if (has_eaten) gen_food();
-      //~ });
-    }
-
-function challenge() {
-	challenge_completed = false;
-	challenge_finish = false;
-	challenge_tile.style.bottom = "50px";
-}
-
-function challenge_done() {
-	challenge_completed = true;
 }
