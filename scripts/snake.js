@@ -5,47 +5,48 @@ const territory_ctx = territory.getContext("2d");
 // set game scale
 const scale = 50;
 
+// colors
+const board_background = "#262626";
+const snake_color = "#BFBFBF";
+const dead_snake_color = "#BF3939";
+const food_color = ["#6a2020", "#961b1b", "#d91414"];
+
 // set territory dimentions
-territory.height = Math.round(window.innerHeight / scale) * scale;
-territory.width = Math.round(window.innerWidth / scale) * scale;
+territory.height = Math.floor(window.innerHeight / scale) * scale;
+territory.width = Math.floor(window.innerWidth / scale) * scale;
+console.log(window.innerHeight, window.innerWidth)
 
 // set glass dimentions
 const glass = document.getElementById("glass");
 glass.style.height = territory.height+'px';
 glass.style.width = territory.width+'px';
 
-glass.style.backdropFilter = "blur(0px)";
+// menu
+const menu_tile = document.getElementById("menu-tile");
+document.getElementById("play-button").onclick = function() {
+	setTimeout(function() {
+		main()
+	}, );
+};
 
-// play button
-const play_button = document.getElementById("play-tile");
-//~ play_button.onclick = main();
+// score
+let score;
+const menu_score_display = document.getElementById("menu-score");
+const pause_score_display = document.getElementById("pause-score");
 
-// challenge
-//~ const challenge_mode = true;
-
-//~ const challenge_tile = document.getElementById("challenge");
-//~ const challenge_completed_button = document.getElementById("challenge_completed");
-//~ const challenge_rule = document.getElementById("rule");
-
-//~ let challenge_completed = true;
-//~ let challenge_in_progress;
-//~ let is_challenge_in_progress = false;
-
-//~ challenge_completed_button.onclick = function () {challenge_completed = true; glass.style.backdropFilter = "blur(0px)"; challenge_tile.style.bottom = "-550px"; console.log('ok')};
-//~ challenge_completed_button.onclick = function () {challenge_completed = true; disparition()};
-//~ challenge_completed_button.removeEventListener('onclick', te());
-//~ challenge_tile.addEventListener("transitionend", function () {if (challenge_completed === true) {is_challenge_in_progress = false}});
-
-//~ function te(){challenge_completed = true; glass.style.backdropFilter = "blur(0px)"; challenge_tile.style.bottom = "-550px"; console.log('ok')}
-//~ function te(){challenge_completed = true; disparition()}
-
-
-
-// colors
-const board_background = "#262626";
-const snake_color = "#BFBFBF";
-const dead_snake_color = "#BF3939";
-const food_color = ["#D9141460", "#D91414A0", "#D91414FF"];
+// pause
+let paused = false;
+let playing;
+const pause_tile = document.getElementById("pause-tile");
+document.addEventListener('keydown', function(event) {
+	if (playing && ['Space', 'Escape', 'KeyP', 'Enter'].includes(event.code)) {pause()}
+});
+pause_tile.addEventListener("animationend", function(event) {
+	if (event.animationName==="hide") {
+		pause_tile.style.display = 'none';
+		paused = false;
+	}
+});
 
 // initial snake positions
 let initials_positions = [
@@ -87,7 +88,8 @@ class Snake {
 	move () {
 		this.next_head();
 		if (this.growing_up > 0) {
-			--this.growing_up;
+			this.growing_up--;
+			score++;
 			
 		} else {
 			this.vertebrae.pop();
@@ -107,7 +109,6 @@ class Snake {
 			territory_ctx.fillStyle = dead_snake_color;  
 			territory_ctx.fillRect(vertebra.x, vertebra.y, scale, scale);  
 			})
-		console.log(this.vertebrae.length-5);
 	}
 	
 	change_direction (event) {
@@ -139,7 +140,7 @@ class Snake {
 	}
 }
 
-// challenge class
+// food class
 class Food {
 	constructor (type, position) {
 		this.position = position;
@@ -154,100 +155,115 @@ class Food {
 	}
 	
 	generate_position (snake, foods) {
-		let occuped_positions = []
-		occuped_positions = occuped_positions.concat(snake.vertebrae)
-		foods.forEach(food => occuped_positions.push(food.position))
+		let occuped_positions = [];
+		occuped_positions = occuped_positions.concat(snake.vertebrae);
+		//~ foods.forEach(food => {occuped_positions.push(food.position); console.log("food.position = ", food.position)});
 		
 		this.position.x = random_number(0, territory.width-scale, scale);
 		this.position.y = random_number(0, territory.height-scale, scale);
 		
-		//~ for (const position of occuped_positions) {
-			//~ console.log(position)
-			//~ if (this.food_position.x == position.x && this.food_position.y == position.y) {
-				//~ this.food_position_generate(snake, challenges);
-			//~ }
-		//~ }
-		//~ console.log(occuped_positions)
-	}
-	
-	//~ challenger () {
-		//~ challenge_completed = false;
-		//~ is_challenge_in_progress = true;
-		//~ glass.style.animation = "flou-progressif 2s ease-out";
-		//~ challenge_tile.style.bottom = "50px";
-	//~ }
-	
-	//~ complete_challenge () {
-		
-	//~ }
-}
-
-init();
-
-// main game
-function main () {
-	while (true) {
-		[snake, foods] = init();
-		play_button.onclick = function () {main(game_loop (snake, foods))};
+		console.log("this.position = ", this.position);
+		for (const occuped_position of occuped_positions) {
+			console.log("	occuped_position = ", occuped_position);
+			if (this.position.x == occuped_position.x && this.position.y == occuped_position.y) {
+				console.log(this.position, occuped_position)
+				console.log("position error")
+				this.generate_position(snake, foods);
+			}
+		}
 	}
 }
 
 // initialisation
-function init () {
+function main () {
+	score = 0;
+	playing = true;
 	const foods = [new Food(0, {x: 100*scale, y: 50*scale}),
 			new Food(1, {x: 102*scale, y: 50*scale}),
 			new Food(2, {x: 104*scale, y: 50*scale}),];
 	
-	const snake = new Snake(initials_positions, direction={x: scale, y: 0});
+	const snake = new Snake(initials_positions.slice(), direction={x: scale, y: 0});
+	document.addEventListener('keydown', function(event) {
+		if (!paused && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+			snake.change_direction(event)
+		}
+	});
 	
 	foods.forEach(food => food.generate_position(snake, foods));
-	document.addEventListener("keydown", function (event) {snake.change_direction(event)});
-	game_loop(snake, foods);
 	
+	menu_tile.style.display = 'none';
+	glass.style.animation = 'deflouter 0.5s forwards';
 	clear_territory();
 	foods.forEach(food => food.draw());
 	snake.draw();
 	
 	game_loop(snake, foods)
-	//~ return [snake, foods];
 }
 
 // game loop
 function game_loop (snake, foods) {
 	if (snake.is_dead()) {
 		snake.dead();
+		end();
 		return
 	};
 	snake.changing_direction = false;
 	
 	setTimeout(function onTick() {
-		if (1==1) {
+		if (!paused) {
 			snake.move();
 			for (let food of foods) {
 				if (snake.did_ate_food(food.position)) {
 					snake.growing_up += food.grow_power;
-					//~ if (challenge_mode) {
-						//~ challenge_in_progress = challenge; 
-						//~ challenge_in_progress.challenger();
-					//~ }
 					food.generate_position(snake, foods);
 				}
 			}
-				
+			
+			menu_score_display.textContent = "SCORE : "+score;
+			pause_score_display.textContent = "SCORE : "+score;
+			
 			clear_territory();
+			draw_score();
 			foods.forEach(food => food.draw());
 			snake.draw();
-		} else {
-			//~ challenge_in_progress.complete_challenge();
-		}
-		
+		}		
 		game_loop(snake, foods );
 	}, 100)
 }
 
-function clear_territory() {
+function clear_territory () {
 	territory_ctx.fillStyle = board_background;
 	territory_ctx.fillRect(0, 0, territory.width, territory.height);
+}
+
+function draw_score () {
+	territory_ctx.font = "bold 200px Ubuntu";
+	territory_ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+	territory_ctx.textAlign = "center";
+	territory_ctx.fillText(score, territory.width/2, territory.height/2+70);
+}
+
+function pause () {
+	if (!paused) {
+		pause_tile.style.display = 'block';
+		pause_tile.style.animation = 'show 1.5s forwards';
+		glass.style.animation = 'flouter 1.5s forwards';
+		paused = true;
+	} else {
+		pause_tile.style.animation = 'hide 1.5s forwards';
+		glass.style.animation = 'deflouter 1.5s forwards';
+		//~ pause_tile.style.display = 'none';
+	}
+}
+
+function end () {
+	playing = false;
+	console.log("Score : ", score)
+	setTimeout(function() {
+		menu_tile.style.display = 'block';
+		menu_tile.style.animation = 'show 1.5s forwards';
+		glass.style.animation = 'flouter 1.5s forwards';
+	}, 300);
 }
 
 function random_number(min, max, step) {
