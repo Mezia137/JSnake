@@ -28,6 +28,9 @@ document.getElementById("play-button").onclick = function() {
 		main()
 	}, );
 };
+document.addEventListener('keyup', function(event) {
+	if (!playing && ['Space', 'Enter'].includes(event.code)) {main()}
+});
 
 // score
 let score;
@@ -162,12 +165,12 @@ class Food {
 		this.position.x = random_number(0, territory.width-scale, scale);
 		this.position.y = random_number(0, territory.height-scale, scale);
 		
-		console.log("this.position = ", this.position);
+		//~ console.log("this.position = ", this.position);
 		for (const occuped_position of occuped_positions) {
-			console.log("	occuped_position = ", occuped_position);
+			//~ console.log("	occuped_position = ", occuped_position);
 			if (this.position.x == occuped_position.x && this.position.y == occuped_position.y) {
-				console.log(this.position, occuped_position)
-				console.log("position error")
+				//~ console.log(this.position, occuped_position)
+				//~ console.log("position error")
 				this.generate_position(snake, foods);
 			}
 		}
@@ -219,6 +222,7 @@ function game_loop (snake, foods) {
 				}
 			}
 			
+			// pas ouf
 			menu_score_display.textContent = "SCORE : "+score;
 			pause_score_display.textContent = "SCORE : "+score;
 			
@@ -258,7 +262,6 @@ function pause () {
 
 function end () {
 	playing = false;
-	console.log("Score : ", score)
 	setTimeout(function() {
 		menu_tile.style.display = 'block';
 		menu_tile.style.animation = 'show 1.5s forwards';
