@@ -21,11 +21,20 @@
    
 -->
 
+<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<!--
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+-->
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
 	<title>SNAKE | nsi project 4 by Méziane</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 1.38" />
@@ -34,23 +43,19 @@
 
 <body>
 	<canvas id="territory"></canvas>
-
-	<div id="glass">
-		<div id="pause-tile">
-			<p id="pause-score">SCORE : 0</p>
-			<h1>PAUSE</h1>
-			<p>press space</p>
-		</div>
-		<div id="menu-tile">
-			<p id="menu-score"></p>
-			<h1>SNAKE</h1>
-			<button id="play-button">PLAY</button>
-		</div>
+	
+	<div id="pause-tile">
+		<p id="pause-score">SCORE : 0</p>
+		<h1>PAUSE</h1>
+		<p>press space</p>
 	</div>
+	<div id="menu-tile">
+		<p id="menu-score"></p>
+		<h1>SNAKE</h1>
+		<button id="play-button">PLAY</button>
+	</div>
+	<script src="scripts/snake.js"></script>
 </body>
-<!--
-<script type="module" src="scripts/Snake.js"></script>
--->
-<script src="scripts/snake.js"></script>
+
 
 </html>

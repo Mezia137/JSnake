@@ -1,107 +1,89 @@
+/* variables couleures*/
 :root {
-  --light-color: #BFBFBF;
-  --dark-color: #262626;
+	--light-color : #BFBFBF;
+	--dark-color : #262626;
 }
 
 body {
-margin : 0;
-background-color : var(--dark-color);
-font-family: 'Ubuntu', sans-serif;
-color: var(--light-color);
-
-position : absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
+	margin : 0;
+	background-color : #262626;
+	font-family : 'Ubuntu', sans-serif;
+	color : var(--light-color);
+	position : absolute;
+	top : 50%;
+	left : 50%;
+	transform : translate(-50%,-50%);
 }
 
-#territory	{
-position : absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-}
-
-#glass {
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-
-/*
-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
-*/
-
-/*
-animation-fill-mode: forwards;
-*/
+#territory {
+	position : absolute;
+	top : 50%;
+	left : 50%;
+	transform : translate(-50%,-50%);
 }
 
 h1 {
-margin : 30px;
-
-font-size: 100px;
-font-weight: bold;
+	margin : 30px;
+	font-size : 100px;
+	font-weight : bold;
 }
 
 p {
-font-size: 30px;
-margin: 0;
+	font-size : 30px;
+	margin : 0;
 }
 
-@keyframes flouter {
-  0% { backdrop-filter: blur(0px); }
-  100% { backdrop-filter: blur(20px); }
+/* animation du flou pour les transitions*/
+@keyframes blur {
+	0% {filter : blur(0);}
+	100% {filter : blur(20px);}
 }
 
-@keyframes deflouter {
-  0% { backdrop-filter: blur(20px); }
-  100% { backdrop-filter: blur(0px); }
+@keyframes unblur {
+	0% {filter : blur(20px);}
+	100% {filter : blur(0);}
 }
 
-@keyframes show {
-  0%   {opacity: 0; filter: blur(30px)}
-  100% {opacity: 100%; filter: blur(0px)}
+@keyframes appear {
+	0% {opacity : 0; filter : blur(30px);}
+	100% {opacity : 100%; filter : blur(0);}
 }
 
-@keyframes hide {
-  0% {opacity: 100%; filter: blur(0px)}
-  100%   {opacity: 0; filter: blur(30px)}
+@keyframes disappear {
+	0% {opacity : 100%; filter : blur(0);}
+	100% {opacity : 0; filter : blur(30px);}
 }
 
+/* style des tuiles (menu et pause)*/
 #menu-tile {
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-
-text-align: center;
-/*
-display: none;
-*/
+	position : absolute;
+	top : 50%;
+	left : 50%;
+	transform : translate(-50%,-50%);
+	text-align : center;
 }
 
 #pause-tile {
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-
-text-align: center;
-display: none;
+	position : absolute;
+	top : 50%;
+	left : 50%;
+	transform : translate(-50%,-50%);
+	text-align : center;
+	display : none;
 }
 
+/* style des boutons */
 button {
-  color: var(--light-color);
-  border: 1px solid var(--light-color);
-  border-radius: 5px;
-  background-color: transparent;
-  padding: 7px 14px;
-  font-size : 15px;
-  display: inline-block;
+	color : var(--light-color);
+	border : var(--light-color) solid 1px;
+	border-radius : 5px;
+	background-color : transparent;
+	padding : 7px 14px;
+	font-size : 15px;
+	display : inline-block;
 }
 
 button:hover {
-  background-color: var(--light-color);
-  color: var(--dark-color);
+	background-color : var(--light-color);
+	color : var(--dark-color);
 }

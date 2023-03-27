@@ -1,0 +1,23 @@
+--ARBRE DOM DE LA PAGE--
+
+- Document (racine)
+- Commentaires
+- <!DOCTYPE html>
+- html
+	- head
+		- meta (charset="utf-8")
+		- title
+		- meta (http-equiv="content-type", content="text/html;charset=utf-8")
+		- meta (name="generator", content="Geany 1.38")
+		- link (rel="stylesheet", href="styles/styles.css")
+	- body
+		- canvas (id="territory")
+		- div (id="pause-tile")
+			- p (id="pause-score")
+			- h1
+			- p
+		- div (id="menu-tile")
+			- p (id="menu-score")
+			- h1
+			- button (id="play-button")
+		- script (src="scripts/snake.js")

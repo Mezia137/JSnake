@@ -14,12 +14,6 @@ const food_color = ["#6a2020", "#961b1b", "#d91414"];
 // set territory dimentions
 territory.height = Math.floor(window.innerHeight / scale) * scale;
 territory.width = Math.floor(window.innerWidth / scale) * scale;
-console.log(window.innerHeight, window.innerWidth)
-
-// set glass dimentions
-const glass = document.getElementById("glass");
-glass.style.height = territory.height+'px';
-glass.style.width = territory.width+'px';
 
 // menu
 const menu_tile = document.getElementById("menu-tile");
@@ -45,7 +39,7 @@ document.addEventListener('keydown', function(event) {
 	if (playing && ['Space', 'Escape', 'KeyP', 'Enter'].includes(event.code)) {pause()}
 });
 pause_tile.addEventListener("animationend", function(event) {
-	if (event.animationName==="hide") {
+	if (event.animationName==="disappear") {
 		pause_tile.style.display = 'none';
 		paused = false;
 	}
@@ -53,11 +47,11 @@ pause_tile.addEventListener("animationend", function(event) {
 
 // initial snake positions
 let initials_positions = [
-	{x: scale*10, y: scale*10},
-	{x: scale*9, y: scale*10},
-	{x: scale*8, y: scale*10},
 	{x: scale*7, y: scale*10},
 	{x: scale*6, y: scale*10},
+	{x: scale*5, y: scale*10},
+	{x: scale*4, y: scale*10},
+	{x: scale*3, y: scale*10},
 ];
 
 // snake class
@@ -66,7 +60,7 @@ class Snake {
 		this.vertebrae = vertebrae;
 		this.direction = direction;
 		this.changing_direction = false;
-		this.head = vertebrae[0];
+		this.head_positon = vertebrae[0];
 		this.growing_up = 0;
 	}
 	
@@ -79,17 +73,17 @@ class Snake {
 		this.vertebrae.forEach(this.draw_vertebra);
 	}
 	
-	next_head () {
-		this.head = {x: ((this.vertebrae[0].x + this.direction.x)%territory.width+territory.width)%territory.width,
+	generate_head_positon () {
+		this.head_positon = {x: ((this.vertebrae[0].x + this.direction.x)%territory.width+territory.width)%territory.width,
 					y: ((this.vertebrae[0].y + this.direction.y)%territory.height+territory.height)%territory.height};
 	}
 	
 	did_ate_food (food_position) {
-		return this.head.x === food_position.x && this.head.y === food_position.y;
+		return this.head_positon.x === food_position.x && this.head_positon.y === food_position.y;
 	}
 	
 	move () {
-		this.next_head();
+		this.generate_head_positon();
 		if (this.growing_up > 0) {
 			this.growing_up--;
 			score++;
@@ -97,8 +91,7 @@ class Snake {
 		} else {
 			this.vertebrae.pop();
 		}
-		this.vertebrae.unshift(this.head);
-
+		this.vertebrae.unshift(this.head_positon);
 	}
 	
 	is_dead () {
@@ -107,7 +100,7 @@ class Snake {
         }
 	}
 	
-	dead () {
+	death_animation () {
 		this.vertebrae.forEach(function(vertebra) {
 			territory_ctx.fillStyle = dead_snake_color;  
 			territory_ctx.fillRect(vertebra.x, vertebra.y, scale, scale);  
@@ -157,27 +150,19 @@ class Food {
 		territory_ctx.fillRect(this.position.x, this.position.y, scale, scale);
 	}
 	
-	generate_position (snake, foods) {
-		let occuped_positions = [];
-		occuped_positions = occuped_positions.concat(snake.vertebrae);
-		//~ foods.forEach(food => {occuped_positions.push(food.position); console.log("food.position = ", food.position)});
-		
+	generate_position (snake_positions) {
 		this.position.x = random_number(0, territory.width-scale, scale);
 		this.position.y = random_number(0, territory.height-scale, scale);
 		
-		//~ console.log("this.position = ", this.position);
-		for (const occuped_position of occuped_positions) {
-			//~ console.log("	occuped_position = ", occuped_position);
+		for (const occuped_position of snake_positions) {
 			if (this.position.x == occuped_position.x && this.position.y == occuped_position.y) {
-				//~ console.log(this.position, occuped_position)
-				//~ console.log("position error")
-				this.generate_position(snake, foods);
+				this.generate_position(snake_positions);
 			}
 		}
 	}
 }
 
-// initialisation
+// initialisation and running game loop
 function main () {
 	score = 0;
 	playing = true;
@@ -192,13 +177,10 @@ function main () {
 		}
 	});
 	
-	foods.forEach(food => food.generate_position(snake, foods));
+	foods.forEach(food => food.generate_position(snake.vertebrae));
 	
 	menu_tile.style.display = 'none';
-	glass.style.animation = 'deflouter 0.5s forwards';
-	clear_territory();
-	foods.forEach(food => food.draw());
-	snake.draw();
+	territory.style.animation = 'unblur 0.7s forwards';
 	
 	game_loop(snake, foods)
 }
@@ -206,7 +188,7 @@ function main () {
 // game loop
 function game_loop (snake, foods) {
 	if (snake.is_dead()) {
-		snake.dead();
+		snake.death_animation();
 		end();
 		return
 	};
@@ -218,16 +200,12 @@ function game_loop (snake, foods) {
 			for (let food of foods) {
 				if (snake.did_ate_food(food.position)) {
 					snake.growing_up += food.grow_power;
-					food.generate_position(snake, foods);
+					food.generate_position(snake.vertebrae);
 				}
 			}
 			
-			// pas ouf
-			menu_score_display.textContent = "SCORE : "+score;
-			pause_score_display.textContent = "SCORE : "+score;
-			
 			clear_territory();
-			draw_score();
+			draw_score_territory();
 			foods.forEach(food => food.draw());
 			snake.draw();
 		}		
@@ -240,7 +218,7 @@ function clear_territory () {
 	territory_ctx.fillRect(0, 0, territory.width, territory.height);
 }
 
-function draw_score () {
+function draw_score_territory () {
 	territory_ctx.font = "bold 200px Ubuntu";
 	territory_ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
 	territory_ctx.textAlign = "center";
@@ -249,23 +227,24 @@ function draw_score () {
 
 function pause () {
 	if (!paused) {
+		pause_score_display.textContent = "SCORE : "+score;
 		pause_tile.style.display = 'block';
-		pause_tile.style.animation = 'show 1.5s forwards';
-		glass.style.animation = 'flouter 1.5s forwards';
+		pause_tile.style.animation = 'appear 1.5s forwards';
+		territory.style.animation = 'blur 1.5s forwards';
 		paused = true;
 	} else {
-		pause_tile.style.animation = 'hide 1.5s forwards';
-		glass.style.animation = 'deflouter 1.5s forwards';
-		//~ pause_tile.style.display = 'none';
+		pause_tile.style.animation = 'disappear 1.5s forwards';
+		territory.style.animation = 'unblur 1.5s forwards';
 	}
 }
 
 function end () {
 	playing = false;
 	setTimeout(function() {
+		menu_score_display.textContent = "SCORE : "+score;
 		menu_tile.style.display = 'block';
-		menu_tile.style.animation = 'show 1.5s forwards';
-		glass.style.animation = 'flouter 1.5s forwards';
+		menu_tile.style.animation = 'appear 1.5s forwards';
+		territory.style.animation = 'blur 1.5s forwards';
 	}, 300);
 }
 
