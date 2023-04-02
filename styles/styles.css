@@ -13,6 +13,7 @@ body {
 	top : 50%;
 	left : 50%;
 	transform : translate(-50%,-50%);
+	cursor: crosshair;
 }
 
 #territory {
@@ -72,18 +73,75 @@ p {
 	display : none;
 }
 
-/* style des boutons */
+.button-container {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
 button {
+	display : inline;
+	height : 40px;
+	padding : 10px 30px;
+	
+	vertical-align: middle;
+	
+	font-size : 15px;
 	color : var(--light-color);
+	background-color : transparent;
+	transition: background-color 0.3s ease-out, color 0.3s ease-out;
+	
 	border : var(--light-color) solid 1px;
 	border-radius : 5px;
-	background-color : transparent;
-	padding : 7px 14px;
-	font-size : 15px;
-	display : inline-block;
+	
+	position: relative;
 }
 
 button:hover {
+	cursor: crosshair;
+}
+
+#play-button {
+	margin-right : 40px;
+}
+
+#play-button:hover {
 	background-color : var(--light-color);
 	color : var(--dark-color);
+	transition: background-color 0.3s ease-out, color 0.3s ease-out;
 }
+
+.settings-button {
+	height : 30px;
+	width : 40px;
+	overflow: hidden;
+	padding : 0;
+	border : 0;
+	border-radius : 0;
+}
+
+.settings-button img {
+	position: absolute;
+	height : 100%;
+	top: 0;
+	vertical-align: middle;
+	
+	transform: translateX(20%) rotate(0deg);
+	transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.settings-button #engrenage {
+	opacity: 0;
+}
+
+.settings-button:hover img {
+	transform: translateX(-65%) rotate(-110deg);
+}
+
+.settings-button:hover #engrenage {
+	opacity: 1;
+}
+
+

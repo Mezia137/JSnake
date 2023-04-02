@@ -3,7 +3,7 @@ const territory = document.getElementById("territory");
 const territory_ctx = territory.getContext("2d");
 
 // set game scale
-const scale = 50;
+const scale = 100;
 
 // colors
 const board_background = "#262626";
@@ -229,12 +229,12 @@ function pause () {
 	if (!paused) {
 		pause_score_display.textContent = "SCORE : "+score;
 		pause_tile.style.display = 'block';
-		pause_tile.style.animation = 'appear 1.5s forwards';
-		territory.style.animation = 'blur 1.5s forwards';
+		pause_tile.style.animation = 'appear 1s forwards';
+		territory.style.animation = 'blur 1s forwards';
 		paused = true;
 	} else {
-		pause_tile.style.animation = 'disappear 1.5s forwards';
-		territory.style.animation = 'unblur 1.5s forwards';
+		pause_tile.style.animation = 'disappear 1s forwards';
+		territory.style.animation = 'unblur 1s forwards';
 	}
 }
 
@@ -243,8 +243,8 @@ function end () {
 	setTimeout(function() {
 		menu_score_display.textContent = "SCORE : "+score;
 		menu_tile.style.display = 'block';
-		menu_tile.style.animation = 'appear 1.5s forwards';
-		territory.style.animation = 'blur 1.5s forwards';
+		menu_tile.style.animation = 'appear 1s forwards';
+		territory.style.animation = 'blur 1s forwards';
 	}, 300);
 }
 
