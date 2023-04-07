@@ -2,8 +2,9 @@
 const territory = document.getElementById("territory");
 const territory_ctx = territory.getContext("2d");
 
-// set game scale
-const scale = 100;
+// set game scale and speed
+let scale = 50;
+let speed = 100;
 
 // colors
 const board_background = "#262626";
@@ -17,14 +18,15 @@ territory.width = Math.floor(window.innerWidth / scale) * scale;
 
 // menu
 const menu_tile = document.getElementById("menu-tile");
-document.getElementById("play-button").onclick = function() {
-	setTimeout(function() {
-		main()
-	}, );
-};
+document.getElementById("play-button").onclick = function() {main();};
 document.addEventListener('keyup', function(event) {
 	if (!playing && ['Space', 'Enter'].includes(event.code)) {main()}
 });
+
+// settings
+document.getElementById("settings-button").onclick = function() {
+	alert("The settings page is under development for v2. It will be possible to set the scale, speed and grow power of each feed.");
+};
 
 // score
 let score;
@@ -38,6 +40,7 @@ const pause_tile = document.getElementById("pause-tile");
 document.addEventListener('keydown', function(event) {
 	if (playing && ['Space', 'Escape', 'KeyP', 'Enter'].includes(event.code)) {pause()}
 });
+// The game resumes only when the animation is finished.
 pause_tile.addEventListener("animationend", function(event) {
 	if (event.animationName==="disappear") {
 		pause_tile.style.display = 'none';
@@ -57,11 +60,11 @@ let initials_positions = [
 // snake class
 class Snake {
 	constructor (vertebrae, direction={x: scale, y: 0}) {
-		this.vertebrae = vertebrae;
-		this.direction = direction;
-		this.changing_direction = false;
+		this.vertebrae = vertebrae; // list of snake positions
+		this.direction = direction; // next x and y movement
+		this.changing_direction = false; 
 		this.head_positon = vertebrae[0];
-		this.growing_up = 0;
+		this.growing_up = 0; // stores the number of vertebrae to grow
 	}
 	
 	draw_vertebra (vertebra) {
@@ -74,6 +77,7 @@ class Snake {
 	}
 	
 	generate_head_positon () {
+		// use of modulo for the periodicity of the territory
 		this.head_positon = {x: ((this.vertebrae[0].x + this.direction.x)%territory.width+territory.width)%territory.width,
 					y: ((this.vertebrae[0].y + this.direction.y)%territory.height+territory.height)%territory.height};
 	}
@@ -84,6 +88,8 @@ class Snake {
 	
 	move () {
 		this.generate_head_positon();
+		// To give the illusion of moving forward the snake gains a new vertebra and loses its last one,
+		// except if there are still vertebrae to grow in this case the last one remains so it grows.
 		if (this.growing_up > 0) {
 			this.growing_up--;
 			score++;
@@ -96,6 +102,7 @@ class Snake {
 	
 	is_dead () {
 		for (let i = 4; i < this.vertebrae.length; i++) {
+        // Check if the snake bites its tail.
         if (this.vertebrae[i].x === this.vertebrae[0].x && this.vertebrae[i].y === this.vertebrae[0].y) return true;
         }
 	}
@@ -112,7 +119,8 @@ class Snake {
 		const RIGHT_KEY = 39;
 		const UP_KEY = 38;
 		const DOWN_KEY = 40;
-	
+		
+		// The snake only changes direction once per tick.
 		if (this.changing_direction) return;
 		this.changing_direction = true;
 
@@ -141,7 +149,7 @@ class Food {
 	constructor (type, position) {
 		this.position = position;
 		this.type = type;
-		this.grow_power = (this.type+1)*2;
+		this.grow_power = (this.type+1)*2; // Number of vertebrae it grows
 
 	}
 	
@@ -154,6 +162,8 @@ class Food {
 		this.position.x = random_number(0, territory.width-scale, scale);
 		this.position.y = random_number(0, territory.height-scale, scale);
 		
+		// The food can't appear under the snake otherwise
+		// the game becomes boring when the snake takes a lot of space because you have to wait to find the food.
 		for (const occuped_position of snake_positions) {
 			if (this.position.x == occuped_position.x && this.position.y == occuped_position.y) {
 				this.generate_position(snake_positions);
@@ -171,6 +181,7 @@ function main () {
 			new Food(2, {x: 104*scale, y: 50*scale}),];
 	
 	const snake = new Snake(initials_positions.slice(), direction={x: scale, y: 0});
+	// Listen to the arrows to change the direction.
 	document.addEventListener('keydown', function(event) {
 		if (!paused && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
 			snake.change_direction(event)
@@ -194,10 +205,12 @@ function game_loop (snake, foods) {
 	};
 	snake.changing_direction = false;
 	
+	// Set the tempo of the game, defined by speed in ms.
 	setTimeout(function onTick() {
 		if (!paused) {
 			snake.move();
 			for (let food of foods) {
+				// Increase the number of vertebrae to grow if a food is eaten.
 				if (snake.did_ate_food(food.position)) {
 					snake.growing_up += food.grow_power;
 					food.generate_position(snake.vertebrae);
@@ -210,7 +223,7 @@ function game_loop (snake, foods) {
 			snake.draw();
 		}		
 		game_loop(snake, foods );
-	}, 100)
+	}, speed)
 }
 
 function clear_territory () {
