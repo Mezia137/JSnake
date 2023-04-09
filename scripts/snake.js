@@ -253,8 +253,9 @@ function pause () {
 
 function end () {
 	playing = false;
+	percentage_score = ((score+initials_positions.length)*100)/((territory.height/scale)*(territory.width/scale))
 	setTimeout(function() {
-		menu_score_display.textContent = "SCORE : "+score;
+		menu_score_display.innerHTML = `SCORE : ${score} ${"&nbsp;".repeat(10)} ${Math.round(percentage_score)}%`;
 		menu_tile.style.display = 'block';
 		menu_tile.style.animation = 'appear 1s forwards';
 		territory.style.animation = 'blur 1s forwards';
