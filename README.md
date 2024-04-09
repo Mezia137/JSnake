@@ -18,10 +18,10 @@ To launch the game, simply open the `index.html` file in your preferred web brow
 
 ## Screenshots
 
-![Screenshot 1](./screeshots/Screenshot1.png)
-![Screenshot 2](./screeshots/Screenshot2.png)
-![Screenshot 3](./screeshots/Screenshot3.png)
-![Screenshot 4](./screeshots/Screenshot4.png)
+![Screenshot 1](./screenshots/Screenshot1.png)
+![Screenshot 2](./screenshots/Screenshot2.png)
+![Screenshot 3](./screenshots/Screenshot3.png)
+![Screenshot 4](./screenshots/Screenshot4.png)
 
 ## License
 
